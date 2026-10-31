@@ -103,7 +103,7 @@
                     </div>
                     <div>
                         <h1 class="text-lg sm:text-xl font-bold tracking-wide leading-tight">มูลนิธิป่อเต็กตึ๊ง</h1>
-                        <p class="text-xs text-red-100">แผนกบรรเทาสาธารณภัย - ระบบรายงานปฏิบัติการ รถ น.เขต</p>
+                        <p class="text-xs text-red-100">แผนกบรรเทาสาธารณภัย - ปฏิบัติการ รถ น.เขต</p>
                     </div>
                 </div>
                 
@@ -195,8 +195,8 @@
                             <tr class="bg-slate-50 text-slate-700 font-bold text-center border-b border-slate-200">
                                 <th class="border-r border-slate-200 px-2 py-3 w-20">เวลา</th>
                                 <th class="border-r border-slate-200 px-2 py-3 w-28">เลขไมล์</th>
-                                <th class="border-r border-slate-200 px-1 py-3 w-14">ว.25</th>
-                                <th class="border-r border-slate-200 px-1 py-3 w-14">ว.10</th>
+                                <th class="border-r border-slate-200 px-1 py-3 w-1">ว.25</th>
+                                <th class="border-r border-slate-200 px-1 py-3 w-1">ว.10</th>
                                 <th class="border-r border-slate-200 px-3 py-3 text-center">สถานที่เกิดเหตุ / รายละเอียด</th>
                                 <th class="px-2 py-3 w-12 text-center no-print">ลบ</th>
                             </tr>
@@ -215,17 +215,17 @@
                         <h4 class="font-bold text-sm text-slate-800 mb-2">บันทึกระยะทาง (เลขไมล์)</h4>
                         
                         <div class="flex items-center justify-between text-xs sm:text-sm">
-                            <span class="font-medium text-slate-600">เลขไมล์สุดท้าย:</span>
+                            <span class="font-medium text-slate-600">เลขไมล์ ว.4:</span>
                             <input type="number" id="mileage-end" oninput="calculateMileage()" class="w-36 border border-slate-300 rounded-lg px-3 py-1.5 text-right font-mono focus:ring-2 focus:ring-ptt-red focus:border-ptt-red outline-none text-slate-800" placeholder="0">
                         </div>
                         
                         <div class="flex items-center justify-between text-xs sm:text-sm">
-                            <span class="font-medium text-slate-600">เลขไมล์เริ่มต้น:</span>
+                            <span class="font-medium text-slate-600">เลขไมล์ ว.14:</span>
                             <input type="number" id="mileage-start" oninput="calculateMileage()" class="w-36 border border-slate-300 rounded-lg px-3 py-1.5 text-right font-mono focus:ring-2 focus:ring-ptt-red focus:border-ptt-red outline-none text-slate-800" placeholder="0">
                         </div>
 
                         <div class="flex items-center justify-between text-xs sm:text-sm font-bold pt-2 border-t border-slate-100">
-                            <span class="text-ptt-red text-sm">รวมเลขไมล์ที่วิ่ง:</span>
+                            <span class="text-ptt-red text-sm">รวมเลขไมล์ที่ออกปฎิบัติงาน:</span>
                             <div class="w-36 text-right font-mono text-lg text-ptt-red font-extrabold" id="mileage-total-display">0 กม.</div>
                         </div>
                     </div>
@@ -248,7 +248,7 @@
 
                         <div class="pt-3 border-t border-slate-100 text-xs sm:text-sm">
                             <div class="flex items-center gap-2">
-                                <span class="font-medium text-slate-600">ลงชื่อ:</span>
+                                <span class="font-medium text-slate-600">ลงชื่อ ผู้ควบคุม รถ.น เขต:</span>
                                 <input type="text" id="inspector-name" class="flex-grow border-b border-slate-300 bg-transparent px-2 py-0.5 focus:outline-none focus:border-ptt-red text-center font-medium" placeholder="ผู้ตรวจสอบรายงาน">
                             </div>
                         </div>
@@ -260,13 +260,6 @@
                     <h4 class="font-bold text-xs uppercase tracking-wider text-slate-600 mb-2">สรุปผลงานประจำวัน (จำนวนเคส/ภารกิจ)</h4>
                     
                     <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-9 gap-1 text-center border border-slate-400 bg-slate-100 rounded overflow-hidden text-xs">
-                        <div class="p-2 border-r border-b md:border-b-0 border-slate-300">
-                            <div class="font-semibold mb-1">ว.4 เขต</div>
-                            <input type="number" id="cnt-v4" min="0" value="0" class="w-full text-center border border-slate-300 rounded py-0.5 font-bold text-slate-800">
-                        </div>
-                        <div class="p-2 border-r border-b md:border-b-0 border-slate-300">
-                            <div class="font-semibold mb-1">ว.18-01</div>
-                            <input type="number" id="cnt-v18" min="0" value="0" class="w-full text-center border border-slate-300 rounded py-0.5 font-bold text-slate-800">
                         </div>
                         <div class="p-2 border-r border-b md:border-b-0 border-slate-300 bg-blue-50/50">
                             <div class="font-semibold mb-1 text-blue-800">ผู้ป่วย</div>
