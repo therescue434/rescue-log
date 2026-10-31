@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบบันทึกรายงานการปฏิบัติงาน - มูลนิธิป่อเต็กตึ๊ง แผนกบรรเทาสาธารณภัย</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts (Sarabun & Prompt) -->
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ptt: {
+                            red: '#CC0000',
+                            darkred: '#990000',
+                            blue: '#003399',
+                            gold: '#D4AF37',
+                            gray: '#F4F6F9'
+                        }
+                    },
+                    fontFamily: {
+                        sarabun: ['Sarabun', 'sans-serif'],
+                        prompt: ['Prompt', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f1f5f9;
+        }
+        h1, h2, h3, h4, .font-heading {
+            font-family: 'Prompt', sans-serif;
+        }
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            .print-only {
+                display: block !important;
+            }
+            body {
+                background-color: white !important;
+                color: black !important;
+                font-size: 11pt;
+            }
+            .page-break {
+                page-break-before: always;
+            }
+            .print-container {
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                box-shadow: none !important;
+            }
+            table {
+                border-collapse: collapse !important;
+                width: 100% !important;
+            }
+            th, td {
+                border: 1px solid #000 !important;
+                padding: 4px 6px !important;
+            }
+        }
+        .print-only {
+            display: none;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen flex flex-col">
+
+    <!-- Top Navigation Header -->
+    <header class="bg-ptt-red text-white shadow-md sticky top-0 z-40 no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-ptt-red font-bold text-xl shadow">
+                        PTTF
+                    </div>
+                    <div>
+                        <h1 class="text-lg sm:text-xl font-bold tracking-wide leading-tight">มูลนิธิป่อเต็กตึ๊ง</h1>
+                        <p class="text-xs text-red-100">แผนกบรรเทาสาธารณภัย - ระบบรายงานปฏิบัติการ รถ น.เขต</p>
+                    </div>
+                </div>
+                
+                <!-- View Navigation Tabs -->
+                <div class="flex items-center space-x-1 sm:space-x-2">
+                    <button onclick="switchTab('form')" id="btn-tab-form" class="px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-1.5 transition bg-white text-ptt-red shadow">
+                        <i data-lucide="file-text" class="w-4 h-4"></i>
+                        <span class="hidden md:inline">แบบฟอร์มบันทึก</span>
+                    </button>
+                    <button onclick="switchTab('dashboard')" id="btn-tab-dashboard" class="px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-1.5 transition text-white hover:bg-ptt-darkred">
+                        <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                        <span class="hidden md:inline">เรียลไทม์แดชบอร์ด</span>
+                    </button>
+                    <button onclick="switchTab('history')" id="btn-tab-history" class="px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-1.5 transition text-white hover:bg-ptt-darkred">
+                        <i data-lucide="history" class="w-4 h-4"></i>
+                        <span class="hidden md:inline">ประวัติรายงาน</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+
+        <!-- ALERT / NOTIFICATION BOX -->
+        <div id="toast" class="hidden fixed bottom-5 right-5 z-50 bg-slate-900 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center space-x-3 transition-all duration-300">
+            <i data-lucide="info" id="toast-icon" class="w-5 h-5 text-emerald-400"></i>
+            <span id="toast-message" class="text-sm font-medium">บันทึกข้อมูลเรียบร้อยแล้ว</span>
+        </div>
+
+        <!-- ================= PAGE 1: FORM INPUT & OFFICIAL DOCUMENT VIEW ================= -->
+        <section id="view-form" class="space-y-6">
+            
+            <!-- Action Toolbar (No Print) -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex flex-wrap items-center justify-between gap-4 no-print">
+                <div class="flex items-center space-x-3">
+                    <span class="px-3 py-1 bg-red-100 text-ptt-red rounded-full text-xs font-semibold">ฟอร์มปฏิบัติงานประจำวัน</span>
+                    <span class="text-sm text-slate-500" id="current-user-display"><i data-lucide="user" class="inline w-4 h-4 mr-1"></i> ผู้กรอก: <span class="font-semibold text-slate-700" id="display-staff-name">ยังไม่ได้ระบุ</span></span>
+                </div>
+                
+                <div class="flex flex-wrap items-center gap-2">
+                    <button onclick="saveCurrentLog()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium flex items-center gap-1.5 transition shadow-sm">
+                        <i data-lucide="save" class="w-4 h-4"></i>
+                        บันทึกรายงาน
+                    </button>
+                    <button onclick="window.print()" class="px-4 py-2 bg-ptt-blue hover:bg-blue-800 text-white rounded-lg text-sm font-medium flex items-center gap-1.5 transition shadow-sm">
+                        <i data-lucide="printer" class="w-4 h-4"></i>
+                        พิมพ์ฟอร์มกระดาษ (100%)
+                    </button>
+                    <button onclick="shareToLine()" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm font-medium flex items-center gap-1.5 transition shadow-sm">
+                        <i data-lucide="share-2" class="w-4 h-4"></i>
+                        คัดลอกสรุปส่ง Line
+                    </button>
+                    <button onclick="resetForm()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-medium transition">
+                        <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- FORM DOCUMENT PAPER (EXACT MATCH TO REAL PHYSICAL PAPER & MOBILE APP UI) -->
+            <div class="bg-white rounded-2xl shadow-lg border border-slate-200 p-4 sm:p-8 max-w-4xl mx-auto print-container">
+                
+                <!-- HEADER SECTION (Paper Style) -->
+                <div class="text-center mb-6 border-b pb-4 border-slate-200">
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-wide font-heading">มูลนิธิป่อเต็กตึ๊ง แผนกบรรเทาสาธารณภัย</h2>
+                    <p class="text-sm font-semibold text-slate-600 mt-1">
+                        ใบรายงานบันทึกผลงาน - รถ น.เขต
+                    </p>
+                    <div class="flex items-center justify-center gap-2 mt-3 text-sm text-slate-700">
+                        <label class="font-bold">ประจำวันที่:</label>
+                        <input type="date" id="doc-date" class="border-b-2 border-slate-300 bg-transparent text-center px-3 py-1 focus:outline-none focus:border-ptt-red font-semibold text-slate-800">
+                    </div>
+                </div>
+
+                <!-- TABLE SECTION (EXACT MATCH TO UI IMAGE 1000044085.jpg & 1000044087.jpg) -->
+                <div class="mb-6 overflow-x-auto">
+                    <div class="flex items-center justify-between mb-3 no-print">
+                        <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                            <i data-lucide="list" class="w-5 h-5 text-ptt-red"></i> ตารางบันทึกการเดินทาง / เหตุการณ์
+                        </h3>
+                        <button onclick="addTripRow()" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-medium rounded-xl text-xs flex items-center gap-2 shadow-sm transition">
+                            <i data-lucide="plus" class="w-4 h-4"></i> เพิ่มแถวรายการ
+                        </button>
+                    </div>
+
+                    <table class="w-full text-xs sm:text-sm border-collapse border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-700 font-bold text-center border-b border-slate-200">
+                                <th class="border-r border-slate-200 px-2 py-3 w-20">เวลา</th>
+                                <th class="border-r border-slate-200 px-2 py-3 w-28">เลขไมล์</th>
+                                <th class="border-r border-slate-200 px-1 py-3 w-14">ว.25</th>
+                                <th class="border-r border-slate-200 px-1 py-3 w-14">ว.10</th>
+                                <th class="border-r border-slate-200 px-3 py-3 text-center">สถานที่เกิดเหตุ / รายละเอียด</th>
+                                <th class="px-2 py-3 w-12 text-center no-print">ลบ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="trip-table-body" class="divide-y divide-slate-200">
+                            <!-- Dynamic rows appended via JS matching the exactly styled layout -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- MILEAGE & EVALUATION SECTION (EXACT MATCH TO UI IMAGE) -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 border border-slate-200 p-5 rounded-2xl bg-white shadow-sm">
+                    
+                    <!-- Left Box: Mileage Calculation -->
+                    <div class="space-y-3 border-b md:border-b-0 md:border-r border-slate-200 pb-4 md:pb-0 md:pr-5">
+                        <h4 class="font-bold text-sm text-slate-800 mb-2">บันทึกระยะทาง (เลขไมล์)</h4>
+                        
+                        <div class="flex items-center justify-between text-xs sm:text-sm">
+                            <span class="font-medium text-slate-600">เลขไมล์สุดท้าย:</span>
+                            <input type="number" id="mileage-end" oninput="calculateMileage()" class="w-36 border border-slate-300 rounded-lg px-3 py-1.5 text-right font-mono focus:ring-2 focus:ring-ptt-red focus:border-ptt-red outline-none text-slate-800" placeholder="0">
+                        </div>
+                        
+                        <div class="flex items-center justify-between text-xs sm:text-sm">
+                            <span class="font-medium text-slate-600">เลขไมล์เริ่มต้น:</span>
+                            <input type="number" id="mileage-start" oninput="calculateMileage()" class="w-36 border border-slate-300 rounded-lg px-3 py-1.5 text-right font-mono focus:ring-2 focus:ring-ptt-red focus:border-ptt-red outline-none text-slate-800" placeholder="0">
+                        </div>
+
+                        <div class="flex items-center justify-between text-xs sm:text-sm font-bold pt-2 border-t border-slate-100">
+                            <span class="text-ptt-red text-sm">รวมเลขไมล์ที่วิ่ง:</span>
+                            <div class="w-36 text-right font-mono text-lg text-ptt-red font-extrabold" id="mileage-total-display">0 กม.</div>
+                        </div>
+                    </div>
+
+                    <!-- Right Box: Evaluation & Inspector Signature -->
+                    <div class="space-y-3 flex flex-col justify-between">
+                        <div>
+                            <span class="font-bold text-sm text-slate-800 block mb-2">ความเห็นการใช้งาน</span>
+                            <div class="flex items-center space-x-6 text-xs sm:text-sm">
+                                <label class="inline-flex items-center cursor-pointer">
+                                    <input type="radio" name="evaluation" value="เหมาะสม" checked class="text-ptt-red focus:ring-ptt-red w-4 h-4">
+                                    <span class="ml-2 font-medium text-slate-700">เหมาะสม</span>
+                                </label>
+                                <label class="inline-flex items-center cursor-pointer">
+                                    <input type="radio" name="evaluation" value="ไม่เหมาะสม" class="text-ptt-red focus:ring-ptt-red w-4 h-4">
+                                    <span class="ml-2 font-medium text-slate-700">ไม่เหมาะสม</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="pt-3 border-t border-slate-100 text-xs sm:text-sm">
+                            <div class="flex items-center gap-2">
+                                <span class="font-medium text-slate-600">ลงชื่อ:</span>
+                                <input type="text" id="inspector-name" class="flex-grow border-b border-slate-300 bg-transparent px-2 py-0.5 focus:outline-none focus:border-ptt-red text-center font-medium" placeholder="ผู้ตรวจสอบรายงาน">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUMMARY CATEGORIES GRID (BOTTOM FORM COUNTERS) -->
+                <div class="mb-6">
+                    <h4 class="font-bold text-xs uppercase tracking-wider text-slate-600 mb-2">สรุปผลงานประจำวัน (จำนวนเคส/ภารกิจ)</h4>
+                    
+                    <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-9 gap-1 text-center border border-slate-400 bg-slate-100 rounded overflow-hidden text-xs">
+                        <div class="p-2 border-r border-b md:border-b-0 border-slate-300">
+                            <div class="font-semibold mb-1">ว.4 เขต</div>
+                            <input type="number" id="cnt-v4" min="0" value="0" class="w-full text-center border border-slate-300 rounded py-0.5 font-bold text-slate-800">
+                        </div>
+                        <div class="p-2 border-r border-b md:border-b-0 border-slate-300">
+                            <div class="font-semibold mb-1">ว.18-01</div>
+                            <input type="number" id="cnt-v18" min="0" value="0" class="w-full text-center border border-slate-300 rounded py-0.5 font-bold text-slate-800">
+                        </div>
+                        <div class="p-2 border-r border-b md:border-b-0 border-slate-300 bg-blue-50/50">
+                            <div class="font-semibold mb-1 text-blue-800">ผู้ป่วย</div>
+                            <input type="number" id="cnt-patient" min="0" value="0" class="w-full text-center border border-slate-300 rounded py-0.5 font-bold text-blue-900">
+                        </div>
+                        <div class="p-2 border-r border-b md:border-b-0 border-slate-300 bg-amber-50/50">
+                            <div class="font-semibold mb-1 text-amber-800">ผู้บาดเจ็บ</div>
+                            <input type="number" id="cnt-injured" min="0" value="0" class="w-full text-center border border-slate-300 rounded py-0.5 font-bold text-amber-900">
+                        </div>
+                        <div class="p-2 border-r border-b md:border-b-0 border-slate-300">
+                            <div class="font-semibold mb-1">บริการ</div>
+                            <input type="number" id="cnt-service" min="0" value="0" class="w-full text-center border border-slate-300 rounded py-0.5 font-bold text-slate-800">
+                        </div>
+                        <div class="p-2 border-r border-b md:border-b-0 border-slate-300 bg-red-50/50">
+                            <div class="font-semibold mb-1 text-red-800">รับศพ</div>
+                            <input type="number" id="cnt-deceased" min="0" value="0" class="w-full text-center border border-slate-300 rounded py-0.5 font-bold text-red-900">
+                        </div>
+                        <div class="p-2 border-r border-b md:border-b-0 border-slate-300">
+                            <div class="font-semibold mb-1">ฝากศพ</div>
+                            <input type="number" id="cnt-deposit-body" min="0" value="0" class="w-full text-center border border-slate-300 rounded py-0.5 font-bold text-slate-800">
+                        </div>
+                        <div class="p-2 border-r border-b md:border-b-0 border-slate-300">
+                            <div class="font-semibold mb-1">พิมพ์มือ</div>
+                            <input type="number" id="cnt-print-hand" min="0" value="0" class="w-full text-center border border-slate-300 rounded py-0.5 font-bold text-slate-800">
+                        </div>
+                        <div class="p-2 col-span-2 sm:col-span-1 bg-emerald-50/50">
+                            <div class="font-semibold mb-1 text-emerald-800">เติมน้ำมัน (บาท)</div>
+                            <input type="number" id="cnt-fuel-liters" step="0.1" min="0" value="0" class="w-full text-center border border-slate-300 rounded py-0.5 font-bold text-emerald-900">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FOOTER & SIGNATURES SECTION -->
+                <div class="space-y-4 pt-4 border-t border-slate-300 text-xs sm:text-sm">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        
+                        <!-- Left Column: Staff Signatures -->
+                        <div class="space-y-3">
+                            <div class="flex items-center gap-2">
+                                <span class="w-32 font-medium">พนักงานขับรถ:</span>
+                                <input type="text" id="staff-driver" oninput="updateStaffDisplay()" class="flex-grow border-b border-slate-400 bg-transparent px-1 focus:outline-none focus:border-ptt-red" placeholder="(ชื่อ - สกุล ผู้ขับรถ น.เขต)">
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-32 font-medium">พนักงานประจำรถ:</span>
+                                <input type="text" id="staff-crew" class="flex-grow border-b border-slate-400 bg-transparent px-1 focus:outline-none focus:border-ptt-red" placeholder="(ชื่อ-สกุล คู่สาย)">
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-32 font-medium">ทะเบียนรถ / เบอร์รถ:</span>
+                                <input type="text" id="car-plate-no" class="flex-grow border-b border-slate-400 bg-transparent px-1 focus:outline-none focus:border-ptt-red" placeholder="เบอร์รถ น.เขต">
+                            </div>
+                        </div>
+
+                        <!-- Right Column: Shift Officer & Department Head -->
+                        <div class="space-y-3">
+                            <div class="flex items-center gap-2">
+                                <span class="w-28 font-medium">เจ้าหน้าที่:</span>
+                                <input type="text" id="officer-code" class="flex-grow border-b border-slate-400 bg-transparent px-1 focus:outline-none focus:border-ptt-red" placeholder="รหัสประจำตัว...">
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-28 font-medium">เวลาทำงาน:</span>
+                                <input type="text" id="shift-start" class="w-20 border-b border-slate-400 text-center bg-transparent focus:outline-none focus:border-ptt-red" placeholder="08.00">
+                                <span>น. ถึง</span>
+                                <input type="text" id="shift-end" class="w-20 border-b border-slate-400 text-center bg-transparent focus:outline-none focus:border-ptt-red" placeholder="16.00">
+                                <span>น.</span>
+                            </div>
+                            <div class="pt-2 flex items-center gap-2">
+                                <span class="w-28 font-medium">ลงชื่อ:</span>
+                                <input type="text" id="head-dept-name" class="flex-grow border-b border-slate-400 bg-transparent px-1 text-center font-medium focus:outline-none focus:border-ptt-red" placeholder="หัวหน้าแผนกบรรเทาสาธารณภัย">
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ================= PAGE 2: REAL-TIME DASHBOARD ================= -->
+        <section id="view-dashboard" class="space-y-6 hidden">
+            <div class="flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                <div>
+                    <h2 class="text-xl font-bold text-slate-800 font-heading">แดชบอร์ดสรุปผลการปฏิบัติงานเรียลไทม์</h2>
+                    <p class="text-xs text-slate-500">ภาพรวมข้อมูลการวิ่งรถกู้ภัย น.เขต และสถิติภารกิจประจำวัน</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <label class="text-xs font-semibold text-slate-600">กรองช่วงเวลา:</label>
+                    <select id="dashboard-filter" onchange="renderDashboard()" class="bg-slate-100 border border-slate-300 rounded-lg text-xs px-3 py-2 font-medium focus:outline-none">
+                        <option value="today">วันนี้</option>
+                        <option value="all" selected>รายการทั้งหมด</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- KEY METRICS CARDS -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-bold text-slate-500 uppercase">ระยะทางวิ่งรวม</span>
+                        <div class="p-2 bg-red-50 text-ptt-red rounded-lg"><i data-lucide="gauge" class="w-5 h-5"></i></div>
+                    </div>
+                    <div class="text-2xl font-extrabold text-slate-800 font-mono" id="dash-total-km">0 <span class="text-xs font-normal text-slate-500">กม.</span></div>
+                    <span class="text-[11px] text-emerald-600 font-medium">อัปเดตเรียลไทม์</span>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-bold text-slate-500 uppercase">จำนวนผู้ป่วย / บาดเจ็บ</span>
+                        <div class="p-2 bg-blue-50 text-ptt-blue rounded-lg"><i data-lucide="heart-pulse" class="w-5 h-5"></i></div>
+                    </div>
+                    <div class="text-2xl font-extrabold text-slate-800 font-mono" id="dash-total-patients">0 <span class="text-xs font-normal text-slate-500">ราย</span></div>
+                    <span class="text-[11px] text-slate-500 font-medium" id="dash-patient-sub">ป่วย: 0 | บาดเจ็บ: 0</span>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-bold text-slate-500 uppercase">จำนวนรับศพ/ฝากศพ</span>
+                        <div class="p-2 bg-slate-100 text-slate-700 rounded-lg"><i data-lucide="file-text" class="w-5 h-5"></i></div>
+                    </div>
+                    <div class="text-2xl font-extrabold text-slate-800 font-mono" id="dash-total-bodies">0 <span class="text-xs font-normal text-slate-500">ร่าง</span></div>
+                    <span class="text-[11px] text-slate-500 font-medium" id="dash-body-sub">รับ: 0 | ฝาก: 0</span>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-bold text-slate-500 uppercase">น้ำมันเชื้อเพลิงที่เติม</span>
+                        <div class="p-2 bg-emerald-50 text-emerald-600 rounded-lg"><i data-lucide="fuel" class="w-5 h-5"></i></div>
+                    </div>
+                    <div class="text-2xl font-extrabold text-slate-800 font-mono" id="dash-total-fuel">0 <span class="text-xs font-normal text-slate-500">ลิตร</span></div>
+                    <span class="text-[11px] text-slate-500 font-medium">รวมทุกรอบปฏิบัติการ</span>
+                </div>
+            </div>
+
+            <!-- CHARTS SECTION -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Task Distribution Pie Chart -->
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                    <h3 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <i data-lucide="pie-chart" class="w-4 h-4 text-ptt-red"></i> สัดส่วนภารกิจงานประจำวัน
+                    </h3>
+                    <div class="h-64 flex items-center justify-center">
+                        <canvas id="chart-tasks"></canvas>
+                    </div>
+                </div>
+
+                <!-- Mileage & Fuel Bar Chart -->
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                    <h3 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <i data-lucide="bar-chart-3" class="w-4 h-4 text-ptt-blue"></i> การใช้น้ำมันและระยะทางวิ่งแยกตามวัน
+                    </h3>
+                    <div class="h-64 flex items-center justify-center">
+                        <canvas id="chart-mileage"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= PAGE 3: HISTORY & DATABASE LOG ================= -->
+        <section id="view-history" class="space-y-6 hidden">
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-xl font-bold text-slate-800 font-heading">ประวัติการบันทึกรายงาน</h2>
+                    <p class="text-xs text-slate-500">ตรวจสอบและเรียกดูข้อมูลการปฏิบัติงานย้อนหลัง</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="exportJSON()" class="px-3 py-1.5 bg-slate-800 text-white rounded-lg text-xs font-medium flex items-center gap-1">
+                        <i data-lucide="download" class="w-3.5 h-3.5"></i> ส่งออกสำรองข้อมูล (JSON)
+                    </button>
+                    <button onclick="clearAllData()" class="px-3 py-1.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg text-xs font-medium transition">
+                        ล้างข้อมูลทั้งหมด
+                    </button>
+                </div>
+            </div>
+
+            <!-- HISTORY TABLE -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-xs sm:text-sm text-left">
+                        <thead class="bg-slate-100 text-slate-700 font-semibold border-b border-slate-200">
+                            <tr>
+                                <th class="p-3">วันที่</th>
+                                <th class="p-3">พนักงานขับรถ</th>
+                                <th class="p-3">ทะเบียน / เบอร์รถ</th>
+                                <th class="p-3 text-center">ระยะทาง (กม.)</th>
+                                <th class="p-3 text-center">ป่วย / บาดเจ็บ</th>
+                                <th class="p-3 text-center">รับศพ</th>
+                                <th class="p-3 text-center">น้ำมัน (ลิตร)</th>
+                                <th class="p-3 text-center">การจัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-table-body" class="divide-y divide-slate-200 text-slate-700">
+                            <!-- Rendered by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-4 mt-auto no-print">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500">
+            มูลนิธิป่อเต็กตึ๊ง แผนกบรรเทาสาธารณภัย &copy; ระบบบันทึกรายงานการปฏิบัติงานและตารางบันทึกการเดินทาง (รถ น.เขต)
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // State Management
+        let appLogs = JSON.parse(localStorage.getItem('ptt_rescue_logs') || '[]');
+        let currentTripRows = [];
+        let chartTaskInstance = null;
+        let chartMileageInstance = null;
+
+        // Initialize App on Load
+        window.onload = function() {
+            lucide.createIcons();
+            setDefaultDate();
+            initializeDefaultRows();
+            renderHistoryTable();
+            renderDashboard();
+        };
+
+        // Switch View Tabs
+        function switchTab(tabName) {
+            ['form', 'dashboard', 'history'].forEach(t => {
+                document.getElementById(`view-${t}`).classList.add('hidden');
+                const btn = document.getElementById(`btn-tab-${t}`);
+                btn.classList.remove('bg-white', 'text-ptt-red', 'shadow');
+                btn.classList.add('text-white', 'hover:bg-ptt-darkred');
+            });
+
+            document.getElementById(`view-${tabName}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`btn-tab-${tabName}`);
+            activeBtn.classList.remove('text-white', 'hover:bg-ptt-darkred');
+            activeBtn.classList.add('bg-white', 'text-ptt-red', 'shadow');
+
+            if (tabName === 'dashboard') {
+                renderDashboard();
+            } else if (tabName === 'history') {
+                renderHistoryTable();
+            }
+        }
+
+        // Set Default Date to Today
+        function setDefaultDate() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('doc-date').value = today;
+        }
+
+        // Initialize 10 Rows for Trip Log (Matching Form Lines)
+        function initializeDefaultRows() {
+            const tbody = document.getElementById('trip-table-body');
+            tbody.innerHTML = '';
+            for (let i = 0; i < 10; i++) {
+                addTripRow();
+            }
+        }
+
+        // Add a Single Trip Row to Table (Matching image placeholder style)
+        function addTripRow(data = {}) {
+            const tbody = document.getElementById('trip-table-body');
+            const rowId = Date.now() + Math.random().toString(36).substr(2, 4);
+            
+            const tr = document.createElement('tr');
+            tr.id = `row-${rowId}`;
+            tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
+            
+            tr.innerHTML = `
+                <td class="border-r border-slate-200 p-2">
+                    <input type="text" class="w-full text-center bg-transparent focus:outline-none focus:bg-amber-50 font-mono text-xs text-slate-700 rounded py-1" value="${data.time || ''}" placeholder="00:00">
+                </td>
+                <td class="border-r border-slate-200 p-2">
+                    <input type="text" class="w-full text-center bg-transparent focus:outline-none focus:bg-amber-50 font-mono text-xs text-slate-700 rounded py-1" value="${data.orderNo || ''}" placeholder="-">
+                </td>
+                <td class="border-r border-slate-200 p-2">
+                    <input type="text" class="w-full text-center bg-transparent focus:outline-none focus:bg-amber-50 text-xs text-slate-700 rounded py-1" value="${data.v25 || ''}">
+                </td>
+                <td class="border-r border-slate-200 p-2">
+                    <input type="text" class="w-full text-center bg-transparent focus:outline-none focus:bg-amber-50 text-xs text-slate-700 rounded py-1" value="${data.v10 || ''}">
+                </td>
+                <td class="border-r border-slate-200 p-2">
+                    <input type="text" class="w-full bg-transparent focus:outline-none focus:bg-amber-50 text-xs text-slate-700 rounded px-2 py-1" value="${data.location || ''}" placeholder="ระบุสถานที่">
+                </td>
+                <td class="p-2 text-center no-print">
+                    <button onclick="removeTripRow('${rowId}')" class="text-slate-400 hover:text-red-600 p-1 rounded hover:bg-red-50 transition">
+                        <i data-lucide="trash-2" class="w-4 h-4 inline"></i>
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+            lucide.createIcons();
+        }
+
+        // Remove Trip Row
+        function removeTripRow(rowId) {
+            const row = document.getElementById(`row-${rowId}`);
+            if (row) row.remove();
+        }
+
+        // Calculate Total Mileage Automatically
+        function calculateMileage() {
+            const start = parseFloat(document.getElementById('mileage-start').value) || 0;
+            const end = parseFloat(document.getElementById('mileage-end').value) || 0;
+            const total = end >= start && start > 0 ? (end - start) : 0;
+            
+            document.getElementById('mileage-total-display').innerText = `${total.toLocaleString()} กม.`;
+            return total;
+        }
+
+        // Update Driver Display Name
+        function updateStaffDisplay() {
+            const driver = document.getElementById('staff-driver').value || 'ยังไม่ได้ระบุ';
+            document.getElementById('display-staff-name').innerText = driver;
+        }
+
+        // Get Form Data Object
+        function getFormData() {
+            // Get Trip Rows
+            const rows = [];
+            document.querySelectorAll('#trip-table-body tr').forEach(tr => {
+                const inputs = tr.querySelectorAll('input');
+                if (inputs[4] && inputs[4].value.trim() !== '') {
+                    rows.push({
+                        time: inputs[0].value,
+                        orderNo: inputs[1].value,
+                        v25: inputs[2].value,
+                        v10: inputs[3].value,
+                        location: inputs[4].value
+                    });
+                }
+            });
+
+            const startKm = parseFloat(document.getElementById('mileage-start').value) || 0;
+            const endKm = parseFloat(document.getElementById('mileage-end').value) || 0;
+            const totalKm = calculateMileage();
+
+            const evalChoice = document.querySelector('input[name="evaluation"]:checked')?.value || 'เหมาะสม';
+
+            return {
+                id: Date.now().toString(),
+                date: document.getElementById('doc-date').value,
+                trips: rows,
+                mileage: {
+                    start: startKm,
+                    end: endKm,
+                    total: totalKm
+                },
+                evaluation: evalChoice,
+                inspector: document.getElementById('inspector-name').value,
+                counters: {
+                    v4: parseInt(document.getElementById('cnt-v4').value) || 0,
+                    v18: parseInt(document.getElementById('cnt-v18').value) || 0,
+                    patient: parseInt(document.getElementById('cnt-patient').value) || 0,
+                    injured: parseInt(document.getElementById('cnt-injured').value) || 0,
+                    service: parseInt(document.getElementById('cnt-service').value) || 0,
+                    deceased: parseInt(document.getElementById('cnt-deceased').value) || 0,
+                    depositBody: parseInt(document.getElementById('cnt-deposit-body').value) || 0,
+                    printHand: parseInt(document.getElementById('cnt-print-hand').value) || 0,
+                    fuelLiters: parseFloat(document.getElementById('cnt-fuel-liters').value) || 0
+                },
+                signatures: {
+                    driver: document.getElementById('staff-driver').value,
+                    crew: document.getElementById('staff-crew').value,
+                    carPlate: document.getElementById('car-plate-no').value,
+                    officerCode: document.getElementById('officer-code').value,
+                    shiftStart: document.getElementById('shift-start').value,
+                    shiftEnd: document.getElementById('shift-end').value,
+                    headDept: document.getElementById('head-dept-name').value
+                },
+                timestamp: new Date().toISOString()
+            };
+        }
+
+        // Save Current Log to LocalStorage & Database
+        function saveCurrentLog() {
+            const data = getFormData();
+            if (!data.signatures.driver) {
+                showToast('กรุณาระบุชื่อพนักงานขับรถก่อนบันทึก', 'alert-circle');
+                return;
+            }
+
+            // Check if record exists for same ID or create new
+            const existingIdx = appLogs.findIndex(l => l.id === data.id);
+            if (existingIdx >= 0) {
+                appLogs[existingIdx] = data;
+            } else {
+                appLogs.unshift(data);
+            }
+
+            localStorage.setItem('ptt_rescue_logs', JSON.stringify(appLogs));
+            showToast('บันทึกรายงานเรียบร้อยแล้ว!', 'check-circle');
+            renderDashboard();
+            renderHistoryTable();
+        }
+
+        // Share Summary via Line (Copy to Clipboard)
+        function shareToLine() {
+            const data = getFormData();
+            const text = `🚨 *รายงานปฏิบัติการ รถ น.เขต (มูลนิธิป่อเต็กตึ๊ง)*
+📅 วันที่: ${data.date}
+🚒 ทะเบียน/เบอร์รถ: ${data.signatures.carPlate || '-'}
+👤 พนักงานขับรถ: ${data.signatures.driver || '-'}
+----------------------------------
+🛣️ ระยะทางไมล์: ${data.mileage.start} - ${data.mileage.end} (${data.mileage.total} กม.)
+⛽ เติมน้ำมัน: ${data.counters.fuelLiters} ลิตร
+----------------------------------
+📊 *สรุปผลงาน:*
+• ผู้ป่วย: ${data.counters.patient} ราย
+• ผู้บาดเจ็บ: ${data.counters.injured} ราย
+• รับศพ: ${data.counters.deceased} ร่าง
+• ฝากศพ: ${data.counters.depositBody} ร่าง
+• ว.4 เขต: ${data.counters.v4} | ว.18-01: ${data.counters.v18}
+----------------------------------
+ความเห็น: ${data.evaluation}`;
+
+            // Copy to clipboard
+            const dummy = document.createElement("textarea");
+            document.body.appendChild(dummy);
+            dummy.value = text;
+            dummy.select();
+            document.execCommand("copy");
+            document.body.removeChild(dummy);
+
+            showToast('คัดลอกสรุปข้อความแล้ว สามารถวางใน Line ได้ทันที!', 'share-2');
+        }
+
+        // Reset Form
+        function resetForm() {
+            if (confirm('คุณต้องการล้างข้อมูลในฟอร์มปัจจุบันหรือไม่?')) {
+                document.querySelectorAll('input[type="text"], input[type="number"]').forEach(i => {
+                    if (i.id !== 'doc-date') i.value = '';
+                });
+                document.querySelectorAll('input[type="number"]').forEach(i => i.value = '0');
+                document.getElementById('mileage-total-display').innerText = '0 กม.';
+                initializeDefaultRows();
+                showToast('รีเซ็ตฟอร์มเรียบร้อย', 'rotate-ccw');
+            }
+        }
+
+        // Toast Notification System
+        function showToast(msg, iconName = 'info') {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-message');
+            const toastIcon = document.getElementById('toast-icon');
+
+            toastMsg.innerText = msg;
+            toastIcon.setAttribute('data-lucide', iconName);
+            lucide.createIcons();
+
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+
+        // Render History Table View
+        function renderHistoryTable() {
+            const tbody = document.getElementById('history-table-body');
+            tbody.innerHTML = '';
+
+            if (appLogs.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center py-6 text-slate-400">ยังไม่มีประวัติการบันทึกข้อมูล</td></tr>`;
+                return;
+            }
+
+            appLogs.forEach((log) => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
+                tr.innerHTML = `
+                    <td class="p-3 font-medium">${log.date}</td>
+                    <td class="p-3">${log.signatures.driver || '-'}</td>
+                    <td class="p-3">${log.signatures.carPlate || '-'}</td>
+                    <td class="p-3 text-center font-mono font-semibold text-ptt-red">${log.mileage.total}</td>
+                    <td class="p-3 text-center">${log.counters.patient} / ${log.counters.injured}</td>
+                    <td class="p-3 text-center">${log.counters.deceased}</td>
+                    <td class="p-3 text-center">${log.counters.fuelLiters}</td>
+                    <td class="p-3 text-center space-x-1">
+                        <button onclick="loadLogToForm('${log.id}')" class="px-2 py-1 bg-blue-50 text-ptt-blue rounded hover:bg-blue-100 text-xs">
+                            เปิดฟอร์ม
+                        </button>
+                        <button onclick="deleteLog('${log.id}')" class="px-2 py-1 bg-red-50 text-red-600 rounded hover:bg-red-100 text-xs">
+                            ลบ
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Load Log Back into Form for Editing or Printing
+        function loadLogToForm(id) {
+            const log = appLogs.find(l => l.id === id);
+            if (!log) return;
+
+            document.getElementById('doc-date').value = log.date;
+            document.getElementById('mileage-start').value = log.mileage.start;
+            document.getElementById('mileage-end').value = log.mileage.end;
+            calculateMileage();
+
+            document.getElementById('inspector-name').value = log.inspector || '';
+            
+            // Set Evaluation Radio
+            const radios = document.querySelectorAll('input[name="evaluation"]');
+            radios.forEach(r => {
+                if (r.value === log.evaluation) r.checked = true;
+            });
+
+            // Counters
+            document.getElementById('cnt-v4').value = log.counters.v4;
+            document.getElementById('cnt-v18').value = log.counters.v18;
+            document.getElementById('cnt-patient').value = log.counters.patient;
+            document.getElementById('cnt-injured').value = log.counters.injured;
+            document.getElementById('cnt-service').value = log.counters.service;
+            document.getElementById('cnt-deceased').value = log.counters.deceased;
+            document.getElementById('cnt-deposit-body').value = log.counters.depositBody;
+            document.getElementById('cnt-print-hand').value = log.counters.printHand;
+            document.getElementById('cnt-fuel-liters').value = log.counters.fuelLiters;
+
+            // Signatures
+            document.getElementById('staff-driver').value = log.signatures.driver || '';
+            document.getElementById('staff-crew').value = log.signatures.crew || '';
+            document.getElementById('car-plate-no').value = log.signatures.carPlate || '';
+            document.getElementById('officer-code').value = log.signatures.officerCode || '';
+            document.getElementById('shift-start').value = log.signatures.shiftStart || '';
+            document.getElementById('shift-end').value = log.signatures.shiftEnd || '';
+            document.getElementById('head-dept-name').value = log.signatures.headDept || '';
+            updateStaffDisplay();
+
+            // Populate Trips
+            const tbody = document.getElementById('trip-table-body');
+            tbody.innerHTML = '';
+            log.trips.forEach(t => addTripRow(t));
+            
+            // Pad remaining empty rows if needed
+            while (tbody.children.length < 10) {
+                addTripRow();
+            }
+
+            switchTab('form');
+            showToast('โหลดข้อมูลเข้าสู่ฟอร์มเรียบร้อย', 'file-text');
+        }
+
+        // Delete Log Record
+        function deleteLog(id) {
+            if (confirm('ยืนยันการลบรายการประวัตินี้?')) {
+                appLogs = appLogs.filter(l => l.id !== id);
+                localStorage.setItem('ptt_rescue_logs', JSON.stringify(appLogs));
+                renderHistoryTable();
+                renderDashboard();
+                showToast('ลบรายการเรียบร้อย', 'trash-2');
+            }
+        }
+
+        // Export Data JSON
+        function exportJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appLogs, null, 2));
+            const dlAnchorElem = document.createElement('a');
+            dlAnchorElem.setAttribute("href", dataStr);
+            dlAnchorElem.setAttribute("download", `ptt_rescue_logs_${new Date().toISOString().split('T')[0]}.json`);
+            document.body.appendChild(dlAnchorElem);
+            dlAnchorElem.click();
+            dlAnchorElem.remove();
+        }
+
+        // Clear All Data
+        function clearAllData() {
+            if (confirm('คำเตือน: คุณต้องการล้างข้อมูลประวัติทั้งหมดใช่หรือไม่? ข้อมูลจะหายไปทันที')) {
+                appLogs = [];
+                localStorage.removeItem('ptt_rescue_logs');
+                renderHistoryTable();
+                renderDashboard();
+                showToast('ล้างข้อมูลทั้งหมดแล้ว', 'rotate-ccw');
+            }
+        }
+
+        // Real-time Dashboard Rendering
+        function renderDashboard() {
+            const filter = document.getElementById('dashboard-filter').value;
+            const todayStr = new Date().toISOString().split('T')[0];
+
+            let filteredLogs = appLogs;
+            if (filter === 'today') {
+                filteredLogs = appLogs.filter(l => l.date === todayStr);
+            }
+
+            // Calculate Metrics
+            let totalKm = 0;
+            let totalPatients = 0;
+            let totalInjured = 0;
+            let totalDeceased = 0;
+            let totalDepositBody = 0;
+            let totalFuel = 0;
+            let totalV4 = 0;
+            let totalV18 = 0;
+            let totalService = 0;
+
+            filteredLogs.forEach(log => {
+                totalKm += (log.mileage.total || 0);
+                totalPatients += (log.counters.patient || 0);
+                totalInjured += (log.counters.injured || 0);
+                totalDeceased += (log.counters.deceased || 0);
+                totalDepositBody += (log.counters.depositBody || 0);
+                totalFuel += (log.counters.fuelLiters || 0);
+                totalV4 += (log.counters.v4 || 0);
+                totalV18 += (log.counters.v18 || 0);
+                totalService += (log.counters.service || 0);
+            });
+
+            // Update DOM Cards
+            document.getElementById('dash-total-km').innerHTML = `${totalKm.toLocaleString()} <span class="text-xs font-normal text-slate-500">กม.</span>`;
+            document.getElementById('dash-total-patients').innerHTML = `${(totalPatients + totalInjured).toLocaleString()} <span class="text-xs font-normal text-slate-500">ราย</span>`;
+            document.getElementById('dash-patient-sub').innerText = `ป่วย: ${totalPatients} | บาดเจ็บ: ${totalInjured}`;
+            
+            document.getElementById('dash-total-bodies').innerHTML = `${(totalDeceased + totalDepositBody).toLocaleString()} <span class="text-xs font-normal text-slate-500">ร่าง</span>`;
+            document.getElementById('dash-body-sub').innerText = `รับ: ${totalDeceased} | ฝาก: ${totalDepositBody}`;
+
+            document.getElementById('dash-total-fuel').innerHTML = `${totalFuel.toLocaleString()} <span class="text-xs font-normal text-slate-500">ลิตร</span>`;
+
+            // Destroy Existing Charts if any
+            if (chartTaskInstance) chartTaskInstance.destroy();
+            if (chartMileageInstance) chartMileageInstance.destroy();
+
+            // Render Task Pie Chart
+            const ctxTask = document.getElementById('chart-tasks').getContext('2d');
+            chartTaskInstance = new Chart(ctxTask, {
+                type: 'doughnut',
+                data: {
+                    labels: ['ผู้ป่วย', 'ผู้บาดเจ็บ', 'รับศพ', 'ฝากศพ', 'บริการ', 'ว.4 เขต', 'ว.18-01'],
+                    datasets: [{
+                        data: [totalPatients, totalInjured, totalDeceased, totalDepositBody, totalService, totalV4, totalV18],
+                        backgroundColor: [
+                            '#3b82f6', '#f59e0b', '#ef4444', '#64748b', 
+                            '#8b5cf6', '#10b981', '#06b6d4'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { font: { family: 'Sarabun' } }
+                        }
+                    }
+                }
+            });
+
+            // Render Mileage/Fuel Bar Chart
+            const dates = filteredLogs.map(l => l.date).slice(0, 7).reverse();
+            const kms = filteredLogs.map(l => l.mileage.total).slice(0, 7).reverse();
+            const fuels = filteredLogs.map(l => l.counters.fuelLiters).slice(0, 7).reverse();
+
+            const ctxMileage = document.getElementById('chart-mileage').getContext('2d');
+            chartMileageInstance = new Chart(ctxMileage, {
+                type: 'bar',
+                data: {
+                    labels: dates.length ? dates : ['ไม่มีข้อมูล'],
+                    datasets: [
+                        {
+                            label: 'ระยะทาง (กม.)',
+                            data: kms.length ? kms : [0],
+                            backgroundColor: '#CC0000',
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'น้ำมัน (ลิตร)',
+                            data: fuels.length ? fuels : [0],
+                            backgroundColor: '#10b981',
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { font: { family: 'Sarabun' } }
+                        }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
+```
