@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -99,11 +100,11 @@
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center space-x-3">
                     <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-ptt-red font-bold text-xl shadow">
-                        PTTF
+                        ปต
                     </div>
                     <div>
                         <h1 class="text-lg sm:text-xl font-bold tracking-wide leading-tight">มูลนิธิป่อเต็กตึ๊ง</h1>
-                        <p class="text-xs text-red-100">แผนกบรรเทาสาธารณภัย - ปฏิบัติการ รถ น.เขต</p>
+                        <p class="text-xs text-red-100">แผนกบรรเทาสาธารณภัย - ระบบรายงานปฏิบัติการ รถ น.เขต</p>
                     </div>
                 </div>
                 
@@ -171,7 +172,7 @@
                 <div class="text-center mb-6 border-b pb-4 border-slate-200">
                     <h2 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-wide font-heading">มูลนิธิป่อเต็กตึ๊ง แผนกบรรเทาสาธารณภัย</h2>
                     <p class="text-sm font-semibold text-slate-600 mt-1">
-                        ใบรายงานบันทึกผลงาน - รถ น.เขต
+                        ใบรายงานส่งต่อพนักงาน ผู้รับ : ผู้ส่ง - รถ น.เขต
                     </p>
                     <div class="flex items-center justify-center gap-2 mt-3 text-sm text-slate-700">
                         <label class="font-bold">ประจำวันที่:</label>
@@ -195,8 +196,8 @@
                             <tr class="bg-slate-50 text-slate-700 font-bold text-center border-b border-slate-200">
                                 <th class="border-r border-slate-200 px-2 py-3 w-20">เวลา</th>
                                 <th class="border-r border-slate-200 px-2 py-3 w-28">เลขไมล์</th>
-                                <th class="border-r border-slate-200 px-1 py-3 w-1">ว.25</th>
-                                <th class="border-r border-slate-200 px-1 py-3 w-1">ว.10</th>
+                                <th class="border-r border-slate-200 px-1 py-3 w-14">ว.25</th>
+                                <th class="border-r border-slate-200 px-1 py-3 w-14">ว.10</th>
                                 <th class="border-r border-slate-200 px-3 py-3 text-center">สถานที่เกิดเหตุ / รายละเอียด</th>
                                 <th class="px-2 py-3 w-12 text-center no-print">ลบ</th>
                             </tr>
@@ -215,17 +216,17 @@
                         <h4 class="font-bold text-sm text-slate-800 mb-2">บันทึกระยะทาง (เลขไมล์)</h4>
                         
                         <div class="flex items-center justify-between text-xs sm:text-sm">
-                            <span class="font-medium text-slate-600">เลขไมล์ ว.4:</span>
-                            <input type="number" id="mileage-end" oninput="calculateMileage()" class="w-36 border border-slate-300 rounded-lg px-3 py-1.5 text-right font-mono focus:ring-2 focus:ring-ptt-red focus:border-ptt-red outline-none text-slate-800" placeholder="0">
+                            <span class="font-medium text-slate-600">เลขไมล์ ว.4 เขต:</span>
+                            <input type="number" id="mileage-start" oninput="calculateMileage()" class="w-36 border border-slate-300 rounded-lg px-3 py-1.5 text-right font-mono focus:ring-2 focus:ring-ptt-red focus:border-ptt-red outline-none text-slate-800" placeholder="0">
                         </div>
                         
                         <div class="flex items-center justify-between text-xs sm:text-sm">
                             <span class="font-medium text-slate-600">เลขไมล์ ว.14:</span>
-                            <input type="number" id="mileage-start" oninput="calculateMileage()" class="w-36 border border-slate-300 rounded-lg px-3 py-1.5 text-right font-mono focus:ring-2 focus:ring-ptt-red focus:border-ptt-red outline-none text-slate-800" placeholder="0">
+                            <input type="number" id="mileage-end" oninput="calculateMileage()" class="w-36 border border-slate-300 rounded-lg px-3 py-1.5 text-right font-mono focus:ring-2 focus:ring-ptt-red focus:border-ptt-red outline-none text-slate-800" placeholder="0">
                         </div>
 
                         <div class="flex items-center justify-between text-xs sm:text-sm font-bold pt-2 border-t border-slate-100">
-                            <span class="text-ptt-red text-sm">รวมเลขไมล์ที่ออกปฎิบัติงาน:</span>
+                            <span class="text-ptt-red text-sm">รวมเลขไมล์ที่วิ่ง:</span>
                             <div class="w-36 text-right font-mono text-lg text-ptt-red font-extrabold" id="mileage-total-display">0 กม.</div>
                         </div>
                     </div>
@@ -248,8 +249,8 @@
 
                         <div class="pt-3 border-t border-slate-100 text-xs sm:text-sm">
                             <div class="flex items-center gap-2">
-                                <span class="font-medium text-slate-600">ลงชื่อ ผู้ควบคุม รถ.น เขต:</span>
-                                <input type="text" id="inspector-name" class="flex-grow border-b border-slate-300 bg-transparent px-2 py-0.5 focus:outline-none focus:border-ptt-red text-center font-medium" placeholder="ผู้ตรวจสอบรายงาน">
+                                <span class="font-medium text-slate-600">ลงชื่อ:</span>
+                                <input type="text" id="inspector-name" class="flex-grow border-b border-slate-300 bg-transparent px-2 py-0.5 focus:outline-none focus:border-ptt-red text-center font-medium" placeholder="ผู้ควบคุมเจ้าหน้าที่ รถ น.เขต">
                             </div>
                         </div>
                     </div>
@@ -257,10 +258,9 @@
 
                 <!-- SUMMARY CATEGORIES GRID (BOTTOM FORM COUNTERS) -->
                 <div class="mb-6">
-                    <h4 class="font-bold text-xs uppercase tracking-wider text-slate-600 mb-2">สรุปผลงานประจำวัน </h4>
+                    <h4 class="font-bold text-xs uppercase tracking-wider text-slate-600 mb-2">สรุปผลงานประจำวัน (จำนวนเคส/ภารกิจ)</h4>
                     
-                    <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-9 gap-1 text-center border border-slate-400 bg-slate-100 rounded overflow-hidden text-xs">
-                        </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-1 text-center border border-slate-400 bg-slate-100 rounded overflow-hidden text-xs">
                         <div class="p-2 border-r border-b md:border-b-0 border-slate-300 bg-blue-50/50">
                             <div class="font-semibold mb-1 text-blue-800">ผู้ป่วย</div>
                             <input type="number" id="cnt-patient" min="0" value="0" class="w-full text-center border border-slate-300 rounded py-0.5 font-bold text-blue-900">
@@ -282,11 +282,11 @@
                             <input type="number" id="cnt-deposit-body" min="0" value="0" class="w-full text-center border border-slate-300 rounded py-0.5 font-bold text-slate-800">
                         </div>
                         <div class="p-2 border-r border-b md:border-b-0 border-slate-300">
-                            <div class="font-semibold mb-1">พิมพ์มือ</div>
+                            <div class="font-semibold mb-1">พิมพ์มือ/แผ่น</div>
                             <input type="number" id="cnt-print-hand" min="0" value="0" class="w-full text-center border border-slate-300 rounded py-0.5 font-bold text-slate-800">
                         </div>
                         <div class="p-2 col-span-2 sm:col-span-1 bg-emerald-50/50">
-                            <div class="font-semibold mb-1 text-emerald-800">เติมน้ำมัน (บาท)</div>
+                            <div class="font-semibold mb-1 text-emerald-800">เติมน้ำมัน (ลิตร)</div>
                             <input type="number" id="cnt-fuel-liters" step="0.1" min="0" value="0" class="w-full text-center border border-slate-300 rounded py-0.5 font-bold text-emerald-900">
                         </div>
                     </div>
@@ -299,28 +299,27 @@
                         <!-- Left Column: Staff Signatures -->
                         <div class="space-y-3">
                             <div class="flex items-center gap-2">
-                                <span class="w-32 font-medium">พนักงานขับรถ น.เขต:</span>
-                                <input type="text" id="staff-driver" oninput="updateStaffDisplay()" class="flex-grow border-b border-slate-400 bg-transparent px-1 focus:outline-none focus:border-ptt-red" placeholder="(ชื่อ - สกุล ผู้ขับรถ น.เขต)">
+                                <span class="w-32 font-medium">พนักงานขับรถ:</span>
+                                <input type="text" id="staff-driver" oninput="updateStaffDisplay()" class="flex-grow border-b border-slate-400 bg-transparent px-1 focus:outline-none focus:border-ptt-red" placeholder="(ผู้ถือ / ผู้รับ / รถ น.เขต)">
                             </div>
                             <div class="flex items-center gap-2">
-                                <span class="w-32 font-medium">คู่สายประจำรถ น.เขต:</span>
-                                <input type="text" id="staff-crew" class="flex-grow border-b border-slate-400 bg-transparent px-1 focus:outline-none focus:border-ptt-red" placeholder="(ชื่อ-สกุล คู่สายประจำรถ น.เขต)">
+                                <span class="w-32 font-medium">พนักงานประจำรถ:</span>
+                                <input type="text" id="staff-crew" class="flex-grow border-b border-slate-400 bg-transparent px-1 focus:outline-none focus:border-ptt-red" placeholder="ชื่อ-สกุล จนท.ประจำรถ น.เขต">
                             </div>
                             <div class="flex items-center gap-2">
                                 <span class="w-32 font-medium">ทะเบียนรถ / เบอร์รถ:</span>
-                                <input type="text" id="car-plate-no" class="flex-grow border-b border-slate-400 bg-transparent px-1 focus:outline-none focus:border-ptt-red" placeholder="ทะเบียน / เบอร์รถ น.เขต">
+                                <input type="text" id="car-plate-no" class="flex-grow border-b border-slate-400 bg-transparent px-1 focus:outline-none focus:border-ptt-red" placeholder="ตราชั่วคราว / เบอร์รถ น.เขต">
                             </div>
                         </div>
 
                         <!-- Right Column: Shift Officer & Department Head -->
                         <div class="space-y-3">
                             <div class="flex items-center gap-2">
-                                <span class="w-28 font-medium">เจ้าหน้าที่:</span>
-                                <input type="text" id="officer-code" class="flex-grow border-b border-slate-400 bg-transparent px-1 focus:outline-none focus:border-ptt-red" placeholder="รหัสกู้ภัย...">
-                                
+                                <span class="w-36 font-medium">รหัสกู้ภัย จนท.น เขต:</span>
+                                <input type="text" id="officer-code" class="flex-grow border-b border-slate-400 bg-transparent px-1 focus:outline-none focus:border-ptt-red" placeholder="รหัสประจำตัว...">
                             </div>
                             <div class="pt-2 flex items-center gap-2">
-                                <span class="w-28 font-medium">ลงชื่อ:</span>
+                                <span class="w-36 font-medium">ลงชื่อ:</span>
                                 <input type="text" id="head-dept-name" class="flex-grow border-b border-slate-400 bg-transparent px-1 text-center font-medium focus:outline-none focus:border-ptt-red" placeholder="หัวหน้าแผนกบรรเทาสาธารณภัย">
                             </div>
                         </div>
@@ -605,8 +604,6 @@
                 evaluation: evalChoice,
                 inspector: document.getElementById('inspector-name').value,
                 counters: {
-                    v4: parseInt(document.getElementById('cnt-v4').value) || 0,
-                    v18: parseInt(document.getElementById('cnt-v18').value) || 0,
                     patient: parseInt(document.getElementById('cnt-patient').value) || 0,
                     injured: parseInt(document.getElementById('cnt-injured').value) || 0,
                     service: parseInt(document.getElementById('cnt-service').value) || 0,
@@ -620,8 +617,6 @@
                     crew: document.getElementById('staff-crew').value,
                     carPlate: document.getElementById('car-plate-no').value,
                     officerCode: document.getElementById('officer-code').value,
-                    shiftStart: document.getElementById('shift-start').value,
-                    shiftEnd: document.getElementById('shift-end').value,
                     headDept: document.getElementById('head-dept-name').value
                 },
                 timestamp: new Date().toISOString()
@@ -666,7 +661,6 @@
 • ผู้บาดเจ็บ: ${data.counters.injured} ราย
 • รับศพ: ${data.counters.deceased} ร่าง
 • ฝากศพ: ${data.counters.depositBody} ร่าง
-• ว.4 เขต: ${data.counters.v4} | ว.18-01: ${data.counters.v18}
 ----------------------------------
 ความเห็น: ${data.evaluation}`;
 
@@ -763,8 +757,6 @@
             });
 
             // Counters
-            document.getElementById('cnt-v4').value = log.counters.v4;
-            document.getElementById('cnt-v18').value = log.counters.v18;
             document.getElementById('cnt-patient').value = log.counters.patient;
             document.getElementById('cnt-injured').value = log.counters.injured;
             document.getElementById('cnt-service').value = log.counters.service;
@@ -778,8 +770,6 @@
             document.getElementById('staff-crew').value = log.signatures.crew || '';
             document.getElementById('car-plate-no').value = log.signatures.carPlate || '';
             document.getElementById('officer-code').value = log.signatures.officerCode || '';
-            document.getElementById('shift-start').value = log.signatures.shiftStart || '';
-            document.getElementById('shift-end').value = log.signatures.shiftEnd || '';
             document.getElementById('head-dept-name').value = log.signatures.headDept || '';
             updateStaffDisplay();
 
@@ -847,8 +837,6 @@
             let totalDeceased = 0;
             let totalDepositBody = 0;
             let totalFuel = 0;
-            let totalV4 = 0;
-            let totalV18 = 0;
             let totalService = 0;
 
             filteredLogs.forEach(log => {
@@ -858,8 +846,6 @@
                 totalDeceased += (log.counters.deceased || 0);
                 totalDepositBody += (log.counters.depositBody || 0);
                 totalFuel += (log.counters.fuelLiters || 0);
-                totalV4 += (log.counters.v4 || 0);
-                totalV18 += (log.counters.v18 || 0);
                 totalService += (log.counters.service || 0);
             });
 
@@ -882,12 +868,11 @@
             chartTaskInstance = new Chart(ctxTask, {
                 type: 'doughnut',
                 data: {
-                    labels: ['ผู้ป่วย', 'ผู้บาดเจ็บ', 'รับศพ', 'ฝากศพ', 'บริการ', 'ว.4 เขต', 'ว.18-01'],
+                    labels: ['ผู้ป่วย', 'ผู้บาดเจ็บ', 'รับศพ', 'ฝากศพ', 'บริการ'],
                     datasets: [{
-                        data: [totalPatients, totalInjured, totalDeceased, totalDepositBody, totalService, totalV4, totalV18],
+                        data: [totalPatients, totalInjured, totalDeceased, totalDepositBody, totalService],
                         backgroundColor: [
-                            '#3b82f6', '#f59e0b', '#ef4444', '#64748b', 
-                            '#8b5cf6', '#10b981', '#06b6d4'
+                            '#3b82f6', '#f59e0b', '#ef4444', '#64748b', '#8b5cf6'
                         ]
                     }]
                 },
